@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "592343100908",
+    "project_id": "traveloop-a3ee7",
+    "storage_bucket": "traveloop-a3ee7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592343100908:android:ee3c7da9019c90edf5e4c9",
+        "android_client_info": {
+          "package_name": "com.example.traveloop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdfb4fq6TvTpG4L6Jt5sH9syZiYLN2jZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

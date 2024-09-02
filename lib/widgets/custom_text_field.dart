@@ -7,7 +7,7 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final FormFieldValidator<String>? validator;
 
-  CustomTextField({
+  const CustomTextField({super.key, 
     required this.controller,
     required this.hintText,
     this.keyboardType = TextInputType.text,
@@ -26,7 +26,7 @@ class CustomTextField extends StatelessWidget {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       ),
       validator: validator,
     );

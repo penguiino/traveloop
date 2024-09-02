@@ -1,13 +1,13 @@
+// lib/screens/share_screen.dart
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../models/trip.dart';
-import '../providers/trip_provider.dart';
 import '../services/firebase_service.dart';
 
 class ShareScreen extends StatefulWidget {
   final Trip trip;
 
-  ShareScreen({required this.trip});
+  const ShareScreen({super.key, required this.trip});
 
   @override
   _ShareScreenState createState() => _ShareScreenState();
@@ -16,6 +16,7 @@ class ShareScreen extends StatefulWidget {
 class _ShareScreenState extends State<ShareScreen> {
   final _emailController = TextEditingController();
   String _selectedPermission = 'View'; // Default permission
+  final FirebaseService _firebaseService = FirebaseService(); // Instance of FirebaseService
 
   @override
   void dispose() {
@@ -26,13 +27,13 @@ class _ShareScreenState extends State<ShareScreen> {
   Future<void> _shareTrip() async {
     if (_emailController.text.isNotEmpty) {
       try {
-        await FirebaseService.shareTrip(
+        await _firebaseService.shareTrip(
           widget.trip.id,
           _emailController.text,
           _selectedPermission,
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Trip shared successfully!')),
+          const SnackBar(content: Text('Trip shared successfully!')),
         );
         _emailController.clear();
         setState(() {}); // Refresh the UI to show updated list
@@ -44,11 +45,30 @@ class _ShareScreenState extends State<ShareScreen> {
     }
   }
 
+  Future<List<Map<String, dynamic>>> _getSharedUsers() async {
+    try {
+      return await _firebaseService.getSharedUsers(widget.trip.id);
+    } catch (e) {
+      throw Exception('Error fetching shared users: $e');
+    }
+  }
+
+  Future<void> _removeSharedUser(String email) async {
+    try {
+      await _firebaseService.removeSharedUser(widget.trip.id, email);
+      setState(() {}); // Refresh the list
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error removing user: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Share Trip'),
+        title: const Text('Share Trip'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -60,7 +80,7 @@ class _ShareScreenState extends State<ShareScreen> {
                 labelText: 'Email',
                 hintText: 'Enter an email to share with',
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),
                   onPressed: () => _emailController.clear(),
                 ),
               ),
@@ -79,25 +99,25 @@ class _ShareScreenState extends State<ShareScreen> {
                   _selectedPermission = value!;
                 });
               },
-              decoration: InputDecoration(labelText: 'Permission'),
+              decoration: const InputDecoration(labelText: 'Permission'),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _shareTrip,
-              icon: Icon(Icons.share),
-              label: Text('Share Trip'),
+              icon: const Icon(Icons.share),
+              label: const Text('Share Trip'),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: FirebaseService.getSharedUsers(widget.trip.id),
+                future: _getSharedUsers(), // Use instance method
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Center(child: Text('Error loading shared users'));
+                    return const Center(child: Text('Error loading shared users'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No users have access to this trip.'));
+                    return const Center(child: Text('No users have access to this trip.'));
                   } else {
                     return ListView.builder(
                       itemCount: snapshot.data!.length,
@@ -107,11 +127,9 @@ class _ShareScreenState extends State<ShareScreen> {
                           title: Text(user['email']),
                           subtitle: Text('Permission: ${user['permission']}'),
                           trailing: IconButton(
-                            icon: Icon(Icons.remove_circle),
+                            icon: const Icon(Icons.remove_circle),
                             onPressed: () async {
-                              await FirebaseService.removeSharedUser(
-                                  widget.trip.id, user['email']);
-                              setState(() {}); // Refresh the list
+                              await _removeSharedUser(user['email']);
                             },
                           ),
                         );

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 class ContainerEditScreen extends StatefulWidget {
   final TripContainer? container; // The container to edit, if null, we're creating a new one
 
-  ContainerEditScreen({this.container});
+  const ContainerEditScreen({Key? key, this.container}) : super(key: key);
 
   @override
   _ContainerEditScreenState createState() => _ContainerEditScreenState();
@@ -36,7 +36,7 @@ class _ContainerEditScreenState extends State<ContainerEditScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      TripContainer newContainer = TripContainer(
+      final newContainer = TripContainer(
         id: widget.container?.id ?? DateTime.now().toString(),
         title: _title,
         type: _type,
@@ -44,21 +44,22 @@ class _ContainerEditScreenState extends State<ContainerEditScreen> {
         nestedContainers: widget.container?.nestedContainers ?? [],
       );
 
-      // If editing, update the existing container, otherwise add a new one
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
       if (widget.container != null) {
-        // Update logic here
-        // This would typically involve updating the container in the trip
-        // and saving it back to the provider or service.
+        // Update existing container
+        tripProvider.selectedTrip?.removeContainer(widget.container!.id);
+        tripProvider.selectedTrip?.addContainer(newContainer);
+        // Possibly call a method on a service to update the trip on the server
       } else {
-        // Add logic here
-        Provider.of<TripProvider>(context, listen: false)
-            .selectedTrip
-            ?.addContainer(newContainer);
+        // Add new container
+        tripProvider.selectedTrip?.addContainer(newContainer);
+        // Possibly call a method on a service to add the container to the server
       }
 
       Navigator.of(context).pop(); // Close the screen after saving
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +68,7 @@ class _ContainerEditScreenState extends State<ContainerEditScreen> {
         title: Text(widget.container == null ? 'Add Container' : 'Edit Container'),
         actions: [
           IconButton(
-            icon: Icon(Icons.save),
+            icon: const Icon(Icons.save),
             onPressed: _saveContainer,
           ),
         ],
@@ -80,7 +81,7 @@ class _ContainerEditScreenState extends State<ContainerEditScreen> {
             children: <Widget>[
               TextFormField(
                 initialValue: _title,
-                decoration: InputDecoration(labelText: 'Title'),
+                decoration: const InputDecoration(labelText: 'Title'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a title';
@@ -93,7 +94,7 @@ class _ContainerEditScreenState extends State<ContainerEditScreen> {
               ),
               DropdownButtonFormField<String>(
                 value: _type,
-                decoration: InputDecoration(labelText: 'Type'),
+                decoration: const InputDecoration(labelText: 'Type'),
                 items: ['City', 'Road', 'Stop', 'Hotel', 'Attraction']
                     .map((type) => DropdownMenuItem(
                   value: type,
@@ -113,7 +114,7 @@ class _ContainerEditScreenState extends State<ContainerEditScreen> {
               // For example, if type is "City", you might ask for coordinates
               TextFormField(
                 initialValue: _details['description'] ?? '',
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Description'),
                 onSaved: (value) {
                   _details['description'] = value;
                 },

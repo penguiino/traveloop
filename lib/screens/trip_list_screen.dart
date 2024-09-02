@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/trip_provider.dart';
 import '../models/trip.dart';
 import '../widgets/trip_card.dart';
 
 class TripListScreen extends StatelessWidget {
+  final List<Trip> trips;
+
+  // Constructor with required parameter
+  const TripListScreen({super.key, required this.trips});
+
   @override
   Widget build(BuildContext context) {
-    final tripProvider = Provider.of<TripProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Trips'),
+        title: const Text('My Trips'),
       ),
-      body: tripProvider.trips.isEmpty
-          ? Center(child: Text('No trips found'))
+      body: trips.isEmpty
+          ? const Center(child: Text('No trips found'))
           : ListView.builder(
-        itemCount: tripProvider.trips.length,
+        itemCount: trips.length,
         itemBuilder: (ctx, index) {
-          final trip = tripProvider.trips[index];
+          final trip = trips[index];
           return TripCard(
             trip: trip,
             onTap: () {
@@ -34,8 +35,8 @@ class TripListScreen extends StatelessWidget {
         onPressed: () {
           Navigator.of(context).pushNamed('/edit_trip');
         },
-        child: Icon(Icons.add),
         tooltip: 'Add New Trip',
+        child: const Icon(Icons.add),
       ),
     );
   }

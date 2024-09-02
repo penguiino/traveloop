@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
+import 'package:traveloop/providers/auth_provider.dart' as traveloop_auth;
+
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart'; // You may need to create this widget for text fields
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -18,16 +22,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+    final authProvider = Provider.of<traveloop_auth.AuthProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : Form(
           key: _formKey,
           child: Column(
@@ -47,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               CustomTextField(
                 controller: _passwordController,
                 hintText: 'Password',
@@ -59,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 32.0),
+              const SizedBox(height: 32.0),
               CustomButton(
                 text: 'Login',
                 onPressed: () async {
@@ -69,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     });
 
                     try {
-                      await authProvider.signInWithEmailAndPassword(
+                      await authProvider.signIn(
                         _emailController.text,
                         _passwordController.text,
                       );
@@ -86,12 +90,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed('/signup');
                 },
-                child: Text('Don\'t have an account? Sign up'),
+                child: const Text('Don\'t have an account? Sign up'),
               ),
             ],
           ),

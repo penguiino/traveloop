@@ -18,7 +18,7 @@ class AuthService {
       return userCredential.user;
     } catch (e) {
       print('Sign Up Error: $e');
-      throw e; // Propagate error to be handled by the caller
+      rethrow; // Propagate error to be handled by the caller
     }
   }
 
@@ -32,7 +32,7 @@ class AuthService {
       return userCredential.user;
     } catch (e) {
       print('Sign In Error: $e');
-      throw e; // Propagate error to be handled by the caller
+      rethrow; // Propagate error to be handled by the caller
     }
   }
 
@@ -42,7 +42,7 @@ class AuthService {
       await _firebaseAuth.signOut();
     } catch (e) {
       print('Sign Out Error: $e');
-      throw e; // Propagate error to be handled by the caller
+      rethrow; // Propagate error to be handled by the caller
     }
   }
 

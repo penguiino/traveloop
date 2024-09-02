@@ -6,6 +6,8 @@ import 'trip_detail_screen.dart';
 import 'trip_edit_screen.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -13,10 +15,10 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Trips'),
+        title: const Text('My Trips'),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () {
               authProvider.signOut();
               Navigator.of(context).pushReplacementNamed('/login');
@@ -28,12 +30,12 @@ class HomeScreen extends StatelessWidget {
         future: tripProvider.loadTrips(authProvider.currentUser!.id),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('An error occurred!'));
+            return const Center(child: Text('An error occurred!'));
           } else {
             return tripProvider.trips.isEmpty
-                ? Center(child: Text('No trips found. Add a new trip!'))
+                ? const Center(child: Text('No trips found. Add a new trip!'))
                 : ListView.builder(
               itemCount: tripProvider.trips.length,
               itemBuilder: (ctx, index) {
@@ -49,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                     ));
                   },
                   trailing: IconButton(
-                    icon: Icon(Icons.edit),
+                    icon: const Icon(Icons.edit),
                     onPressed: () {
                       tripProvider.selectTrip(trip);
                       Navigator.of(context).push(MaterialPageRoute(
@@ -72,7 +74,7 @@ class HomeScreen extends StatelessWidget {
             ),
           );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

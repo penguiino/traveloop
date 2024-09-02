@@ -1,7 +1,10 @@
+// lib/services/firebase_service.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../models/container.dart';
 import '../models/trip.dart';
-import '../models/trip_container.dart';
+import '../models/user.dart';
 
 class FirebaseService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -10,6 +13,25 @@ class FirebaseService {
   // Get the current user
   User? getCurrentUser() {
     return _firebaseAuth.currentUser;
+  }
+
+  // Save a user to Firestore
+  Future<void> saveUser(AppUser user) async {
+    await _firestore.collection('users').doc(user.id).set(user.toJson());
+  }
+
+  // Get a user by their ID
+  Future<AppUser> getUserById(String userId) async {
+    try {
+      final doc = await _firestore.collection('users').doc(userId).get();
+      if (doc.exists) {
+        return AppUser.fromJson(doc.data()!);
+      } else {
+        throw Exception('User not found');
+      }
+    } catch (e) {
+      throw Exception('Error fetching user: $e');
+    }
   }
 
   // Add a new trip
@@ -44,6 +66,8 @@ class FirebaseService {
         startDate: DateTime.parse(data['startDate']),
         endDate: DateTime.parse(data['endDate']),
         containers: List<TripContainer>.from(data['containers'].map((item) => TripContainer.fromMap(item))),
+        ownerId: data['ownerId'] ?? '',
+        description: data['description'] ?? '',
       );
     }).toList();
   }
@@ -58,6 +82,8 @@ class FirebaseService {
       startDate: DateTime.parse(data['startDate']),
       endDate: DateTime.parse(data['endDate']),
       containers: List<TripContainer>.from(data['containers'].map((item) => TripContainer.fromMap(item))),
+      ownerId: data['ownerId'] ?? '',
+      description: data['description'] ?? '',
     );
   }
 
@@ -123,5 +149,22 @@ class FirebaseService {
     } else {
       throw Exception('User not found');
     }
+  }
+
+  // Get a list of trips for a specific user
+  Future<List<Trip>> getTripsByUser(String userId) async {
+    final tripSnapshots = await _firestore.collection('users').doc(userId).collection('trips').get();
+    return tripSnapshots.docs.map((doc) {
+      final data = doc.data();
+      return Trip(
+        id: doc.id,
+        name: data['name'],
+        startDate: DateTime.parse(data['startDate']),
+        endDate: DateTime.parse(data['endDate']),
+        containers: List<TripContainer>.from(data['containers'].map((item) => TripContainer.fromMap(item))),
+        ownerId: data['ownerId'] ?? '',
+        description: data['description'] ?? '',
+      );
+    }).toList();
   }
 }

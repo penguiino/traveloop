@@ -13,7 +13,7 @@ class CustomButton extends StatelessWidget {
   final bool isLoading;
 
   const CustomButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.color = primaryColor,
@@ -22,20 +22,19 @@ class CustomButton extends StatelessWidget {
     this.borderRadius = 8.0, // Provide a constant default value
     this.icon,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        primary: color, // Button color
-        onPrimary: textColor, // Text color
+        foregroundColor: textColor, backgroundColor: color, // Text color
         elevation: elevation,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius), // Rounded corners
         ),
-        padding: EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
       ),
       child: isLoading
           ? SizedBox(
@@ -49,7 +48,7 @@ class CustomButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           if (icon != null) icon!,
-          if (icon != null) SizedBox(width: 8.0),
+          if (icon != null) const SizedBox(width: 8.0),
           Text(
             text,
             style: TextStyle(

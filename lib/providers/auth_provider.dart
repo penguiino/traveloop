@@ -5,6 +5,7 @@ import '../services/firebase_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseService _firebaseService = FirebaseService(); // Create an instance
   AppUser? _currentUser;
 
   AppUser? get currentUser => _currentUser;
@@ -13,7 +14,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> initializeUser() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      _currentUser = await FirebaseService.getUserById(user.uid);
+      _currentUser = await _firebaseService.getUserById(user.uid);
       notifyListeners();
     }
   }
@@ -25,8 +26,7 @@ class AuthProvider with ChangeNotifier {
         email: email,
         password: password,
       );
-      _currentUser =
-      await FirebaseService.getUserById(userCredential.user!.uid);
+      _currentUser = await _firebaseService.getUserById(userCredential.user!.uid);
       notifyListeners();
       return true;
     } catch (e) {
@@ -46,7 +46,7 @@ class AuthProvider with ChangeNotifier {
         email: email,
         createdAt: DateTime.now(),
       );
-      await FirebaseService.saveUser(_currentUser!);
+      await _firebaseService.saveUser(_currentUser!); // Save user
       notifyListeners();
       return true;
     } catch (e) {

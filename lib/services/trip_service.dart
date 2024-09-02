@@ -1,3 +1,5 @@
+// lib/providers/trip_provider.dart
+
 import 'package:flutter/material.dart';
 import '../models/trip.dart';
 import '../services/firebase_service.dart';
@@ -8,14 +10,15 @@ class TripService with ChangeNotifier {
 
   List<Trip> get trips => _trips;
 
-  // Load trips from Firebase
-  Future<void> loadTrips() async {
+  // Method to load trips for a specific user by userId
+  Future<void> getTripsByUser(String userId) async {
     try {
-      _trips = await _firebaseService.getTrips();
+      final trips = await _firebaseService.getTripsByUser(userId);
+      _trips = trips;
       notifyListeners();
     } catch (e) {
-      print('Error loading trips: $e');
-      throw e; // Handle errors as needed
+      print('Error getting trips by user: $e');
+      rethrow; // Handle errors as needed
     }
   }
 
@@ -27,7 +30,7 @@ class TripService with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('Error adding trip: $e');
-      throw e; // Handle errors as needed
+      rethrow; // Handle errors as needed
     }
   }
 
@@ -42,7 +45,7 @@ class TripService with ChangeNotifier {
       }
     } catch (e) {
       print('Error updating trip: $e');
-      throw e; // Handle errors as needed
+      rethrow; // Handle errors as needed
     }
   }
 
@@ -54,7 +57,7 @@ class TripService with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('Error deleting trip: $e');
-      throw e; // Handle errors as needed
+      rethrow; // Handle errors as needed
     }
   }
 
@@ -62,20 +65,19 @@ class TripService with ChangeNotifier {
   Future<void> shareTrip(String tripId, String email, String permission) async {
     try {
       await _firebaseService.shareTrip(tripId, email, permission);
-      // Optionally update local state or notify users
     } catch (e) {
       print('Error sharing trip: $e');
-      throw e; // Handle errors as needed
+      rethrow; // Handle errors as needed
     }
   }
 
-  // Get users who have access to the trip
+  // Get users who have access to a trip
   Future<List<Map<String, dynamic>>> getSharedUsers(String tripId) async {
     try {
       return await _firebaseService.getSharedUsers(tripId);
     } catch (e) {
       print('Error getting shared users: $e');
-      throw e; // Handle errors as needed
+      rethrow; // Handle errors as needed
     }
   }
 
@@ -83,10 +85,9 @@ class TripService with ChangeNotifier {
   Future<void> removeSharedUser(String tripId, String email) async {
     try {
       await _firebaseService.removeSharedUser(tripId, email);
-      // Optionally update local state or notify users
     } catch (e) {
       print('Error removing shared user: $e');
-      throw e; // Handle errors as needed
+      rethrow; // Handle errors as needed
     }
   }
 }

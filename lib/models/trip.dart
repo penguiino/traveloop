@@ -1,5 +1,3 @@
-// lib/models/trip.dart
-import 'package:flutter/foundation.dart';
 import 'container.dart';
 
 class Trip {
@@ -11,7 +9,7 @@ class Trip {
   final DateTime endDate;
   final List<String> collaborators;
   final Map<String, dynamic> metadata;
-  final String description; // Add description property
+  final String description;
 
   Trip({
     required this.id,
@@ -22,7 +20,7 @@ class Trip {
     required this.endDate,
     this.collaborators = const [],
     this.metadata = const {},
-    required this.description, // Initialize description property
+    required this.description,
   });
 
   // Add method to convert from JSON
@@ -38,7 +36,7 @@ class Trip {
       endDate: DateTime.parse(json['endDate']),
       collaborators: List<String>.from(json['collaborators']),
       metadata: json['metadata'] ?? {},
-      description: json['description'] ?? '', // Parse description from JSON
+      description: json['description'] ?? '',
     );
   }
 
@@ -53,7 +51,7 @@ class Trip {
       'endDate': endDate.toIso8601String(),
       'collaborators': collaborators,
       'metadata': metadata,
-      'description': description, // Convert description to JSON
+      'description': description,
     };
   }
 
@@ -75,5 +73,20 @@ class Trip {
   // Add method to remove a collaborator from the trip
   void removeCollaborator(String userId) {
     collaborators.removeWhere((collaborator) => collaborator == userId);
+  }
+
+  // Factory constructor for an empty Trip
+  factory Trip.empty() {
+    return Trip(
+      id: '',
+      name: '',
+      ownerId: '',
+      containers: [],
+      startDate: DateTime.now(),
+      endDate: DateTime.now(),
+      collaborators: [],
+      metadata: {},
+      description: '',
+    );
   }
 }

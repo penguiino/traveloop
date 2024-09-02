@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/trip_container.dart';
+import '../models/container.dart';
 import '../utils/constants.dart';
 
 class ContainerWidget extends StatelessWidget {
@@ -8,16 +8,16 @@ class ContainerWidget extends StatelessWidget {
   final VoidCallback? onViewDetails;
 
   const ContainerWidget({
-    Key? key,
+    super.key,
     required this.container,
     this.onEdit,
     this.onViewDetails,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
       ),
@@ -33,12 +33,12 @@ class ContainerWidget extends StatelessWidget {
                 container.title,
                 style: headingStyle,
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
                 'Type: ${container.type}',
                 style: bodyStyle.copyWith(color: secondaryColor),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
                 container.details,
                 style: bodyStyle,
@@ -66,7 +66,7 @@ class ContainerWidget extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: onEdit,
-                    child: Text('Edit', style: TextStyle(color: primaryColor)),
+                    child: const Text('Edit', style: TextStyle(color: primaryColor)),
                   ),
                 ),
             ],

@@ -1,11 +1,15 @@
-// lib/widgets/trip_card.dart
 import 'package:flutter/material.dart';
 import '../models/trip.dart'; // Import the Trip model
 
 class TripCard extends StatelessWidget {
   final Trip trip;
+  final VoidCallback onTap; // Add the onTap parameter
 
-  TripCard({required this.trip});
+  const TripCard({
+    super.key,
+    required this.trip,
+    required this.onTap, // Add the onTap parameter to the constructor
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +17,7 @@ class TripCard extends StatelessWidget {
       child: ListTile(
         title: Text(trip.name), // Use 'name' instead of 'title'
         subtitle: Text(trip.description), // Ensure description property is used
-        // Other widgets and properties
+        onTap: onTap, // Handle the tap
       ),
     );
   }
