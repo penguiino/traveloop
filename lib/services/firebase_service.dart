@@ -1,8 +1,5 @@
-// lib/services/firebase_service.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/container.dart';
 import '../models/trip.dart';
 import '../models/user.dart';
 
@@ -21,90 +18,67 @@ class FirebaseService {
   }
 
   // Get a user by their ID
-  Future<AppUser> getUserById(String userId) async {
+  Future<AppUser?> getUserById(String id) async {
     try {
-      final doc = await _firestore.collection('users').doc(userId).get();
+      final doc = await _firestore.collection('users').doc(id).get();
       if (doc.exists) {
-        return AppUser.fromJson(doc.data()!);
+        final data = doc.data();
+        if (data != null) {
+          return AppUser.fromJson(data);
+        } else {
+          throw Exception('User data is null');
+        }
       } else {
         throw Exception('User not found');
       }
     } catch (e) {
-      throw Exception('Error fetching user: $e');
+      print('Error fetching user: $e');
+      return null;
     }
   }
 
-  // Add a new trip
   Future<void> addTrip(Trip trip) async {
-    final userId = getCurrentUser()!.uid;
-    await _firestore.collection('users').doc(userId).collection('trips').add({
-      'name': trip.name,
-      'startDate': trip.startDate.toIso8601String(),
-      'endDate': trip.endDate.toIso8601String(),
-      'containers': trip.containers.map((container) => {
-        'title': container.title,
-        'type': container.type,
-        'details': container.details,
-        'subContainers': container.subContainers.map((sub) => {
-          'title': sub.title,
-          'type': sub.type,
-          'details': sub.details,
-        }).toList(),
-      }).toList(),
-    });
+    try {
+      final userId = getCurrentUser()!.uid;
+      print('Adding trip for user: $userId');
+      await _firestore.collection('users').doc(userId).collection('trips').add(trip.toMap());
+      print('Trip added successfully');
+    } catch (e) {
+      print('Error adding trip: $e');
+    }
   }
 
-  // Get a list of trips for the current user
   Future<List<Trip>> getTrips() async {
-    final userId = getCurrentUser()!.uid;
-    final tripSnapshots = await _firestore.collection('users').doc(userId).collection('trips').get();
-    return tripSnapshots.docs.map((doc) {
-      final data = doc.data();
-      return Trip(
-        id: doc.id,
-        name: data['name'],
-        startDate: DateTime.parse(data['startDate']),
-        endDate: DateTime.parse(data['endDate']),
-        containers: List<TripContainer>.from(data['containers'].map((item) => TripContainer.fromMap(item))),
-        ownerId: data['ownerId'] ?? '',
-        description: data['description'] ?? '',
-      );
-    }).toList();
+    print('getTrips() method called');
+    try {
+      final userId = getCurrentUser()!.uid;
+      print('Fetching trips for user: $userId');
+      final tripSnapshots = await _firestore.collection('users').doc(userId).collection('trips').get();
+      final trips = tripSnapshots.docs.map((doc) => Trip.fromMap(doc.data() as Map<String, dynamic>)).toList();
+      print('Trips fetched: ${trips.length}');
+      return trips;
+    } catch (e) {
+      print('Error fetching trips: $e');
+      return [];
+    }
   }
 
-  // Get a single trip by ID
   Future<Trip> getTrip(String tripId) async {
-    final doc = await _firestore.collection('users').doc(getCurrentUser()!.uid).collection('trips').doc(tripId).get();
-    final data = doc.data()!;
-    return Trip(
-      id: doc.id,
-      name: data['name'],
-      startDate: DateTime.parse(data['startDate']),
-      endDate: DateTime.parse(data['endDate']),
-      containers: List<TripContainer>.from(data['containers'].map((item) => TripContainer.fromMap(item))),
-      ownerId: data['ownerId'] ?? '',
-      description: data['description'] ?? '',
-    );
+    try {
+      final doc = await _firestore.collection('users').doc(getCurrentUser()!.uid).collection('trips').doc(tripId).get();
+      print('Trip fetched successfully');
+      return Trip.fromMap(doc.data() as Map<String, dynamic>);
+    } catch (e) {
+      print('Error fetching trip: $e');
+      rethrow; // or return a default Trip object if applicable
+    }
   }
+
 
   // Update a trip
   Future<void> updateTrip(Trip trip) async {
     final userId = getCurrentUser()!.uid;
-    await _firestore.collection('users').doc(userId).collection('trips').doc(trip.id).update({
-      'name': trip.name,
-      'startDate': trip.startDate.toIso8601String(),
-      'endDate': trip.endDate.toIso8601String(),
-      'containers': trip.containers.map((container) => {
-        'title': container.title,
-        'type': container.type,
-        'details': container.details,
-        'subContainers': container.subContainers.map((sub) => {
-          'title': sub.title,
-          'type': sub.type,
-          'details': sub.details,
-        }).toList(),
-      }).toList(),
-    });
+    await _firestore.collection('users').doc(userId).collection('trips').doc(trip.id).update(trip.toMap());
   }
 
   // Delete a trip
@@ -115,7 +89,6 @@ class FirebaseService {
 
   // Share a trip with a user
   Future<void> shareTrip(String tripId, String email, String permission) async {
-    final userId = getCurrentUser()!.uid;
     final userDoc = await _firestore.collection('users').where('email', isEqualTo: email).get();
     if (userDoc.docs.isNotEmpty) {
       final sharedUserId = userDoc.docs.first.id;
@@ -127,44 +100,30 @@ class FirebaseService {
     }
   }
 
-  // Get users who have access to the trip
+  // Get shared users for a trip
   Future<List<Map<String, dynamic>>> getSharedUsers(String tripId) async {
-    final sharedUsersSnapshot = await _firestore.collection('trips').doc(tripId).collection('sharedWith').get();
-    final users = await Future.wait(sharedUsersSnapshot.docs.map((doc) async {
-      final userDoc = await _firestore.collection('users').doc(doc.id).get();
-      return {
-        'email': userDoc.data()?['email'],
-        'permission': doc.data()['permission'],
-      };
-    }));
-    return users;
-  }
-
-  // Remove a user from the shared list
-  Future<void> removeSharedUser(String tripId, String email) async {
-    final userDoc = await _firestore.collection('users').where('email', isEqualTo: email).get();
-    if (userDoc.docs.isNotEmpty) {
-      final sharedUserId = userDoc.docs.first.id;
-      await _firestore.collection('trips').doc(tripId).collection('sharedWith').doc(sharedUserId).delete();
-    } else {
-      throw Exception('User not found');
-    }
-  }
-
-  // Get a list of trips for a specific user
-  Future<List<Trip>> getTripsByUser(String userId) async {
-    final tripSnapshots = await _firestore.collection('users').doc(userId).collection('trips').get();
-    return tripSnapshots.docs.map((doc) {
-      final data = doc.data();
-      return Trip(
-        id: doc.id,
-        name: data['name'],
-        startDate: DateTime.parse(data['startDate']),
-        endDate: DateTime.parse(data['endDate']),
-        containers: List<TripContainer>.from(data['containers'].map((item) => TripContainer.fromMap(item))),
-        ownerId: data['ownerId'] ?? '',
-        description: data['description'] ?? '',
-      );
+    final sharedWithSnapshot = await _firestore.collection('trips').doc(tripId).collection('sharedWith').get();
+    return sharedWithSnapshot.docs.map((doc) => {
+      'email': doc.id, // Assuming the document ID is the user's email
+      'permission': doc.data()['permission']
     }).toList();
+  }
+
+  Future<void> removeSharedUser(String tripId, String email) async {
+    final currentUser = getCurrentUser();
+    if (currentUser == null) throw Exception('No user logged in');
+
+    final userQuery = await _firestore.collection('users').where('email', isEqualTo: email).get();
+    if (userQuery.docs.isEmpty) throw Exception('User not found');
+
+    final userId = userQuery.docs.first.id;
+    await _firestore.collection('trips').doc(tripId).collection('sharedWith').doc(userId).delete();
+  }
+
+
+  // Fetch trips for a specific user
+  Future<List<Trip>> getTripsByUser(String userId) async {
+    final snapshot = await _firestore.collection('users').doc(userId).collection('trips').get();
+    return snapshot.docs.map((doc) => Trip.fromMap(doc.data())).toList();
   }
 }

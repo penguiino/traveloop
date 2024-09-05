@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:provider/provider.dart';
 import 'package:traveloop/providers/auth_provider.dart' as traveloop_auth;
-
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart'; // You may need to create this widget for text fields
 

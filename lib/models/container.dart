@@ -1,4 +1,3 @@
-
 class TripContainer {
   final String id;
   final String title;
@@ -14,7 +13,7 @@ class TripContainer {
     this.details = const {},
   });
 
-  // Add method to convert from JSON
+  // Convert from JSON
   factory TripContainer.fromJson(Map<String, dynamic> json) {
     return TripContainer(
       id: json['id'],
@@ -27,7 +26,7 @@ class TripContainer {
     );
   }
 
-  // Add method to convert to JSON
+  // Convert to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -38,12 +37,36 @@ class TripContainer {
     };
   }
 
-  // Add method to add a nested container
+  // Convert from Map (used for Firestore or other map-based storage)
+  factory TripContainer.fromMap(Map<String, dynamic> map) {
+    return TripContainer(
+      id: map['id'],
+      title: map['title'],
+      type: map['type'],
+      nestedContainers: (map['nestedContainers'] as List)
+          .map((container) => TripContainer.fromMap(container))
+          .toList(),
+      details: Map<String, dynamic>.from(map['details'] ?? {}),
+    );
+  }
+
+  // Convert to Map (for storing in Firestore)
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'type': type,
+      'nestedContainers': nestedContainers.map((c) => c.toMap()).toList(),
+      'details': details,
+    };
+  }
+
+  // Add a nested container
   void addNestedContainer(TripContainer container) {
     nestedContainers.add(container);
   }
 
-  // Add method to remove a nested container
+  // Remove a nested container
   void removeNestedContainer(String containerId) {
     nestedContainers.removeWhere((container) => container.id == containerId);
   }

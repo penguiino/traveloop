@@ -1,5 +1,3 @@
-// lib/screens/share_screen.dart
-
 import 'package:flutter/material.dart';
 import '../models/trip.dart';
 import '../services/firebase_service.dart';

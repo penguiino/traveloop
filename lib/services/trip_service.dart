@@ -1,5 +1,3 @@
-// lib/providers/trip_provider.dart
-
 import 'package:flutter/material.dart';
 import '../models/trip.dart';
 import '../services/firebase_service.dart';

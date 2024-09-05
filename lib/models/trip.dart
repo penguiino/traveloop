@@ -23,7 +23,7 @@ class Trip {
     required this.description,
   });
 
-  // Add method to convert from JSON
+  // Convert from JSON
   factory Trip.fromJson(Map<String, dynamic> json) {
     return Trip(
       id: json['id'],
@@ -40,13 +40,45 @@ class Trip {
     );
   }
 
-  // Add method to convert to JSON
+  // Convert to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'name': name,
       'ownerId': ownerId,
       'containers': containers.map((c) => c.toJson()).toList(),
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate.toIso8601String(),
+      'collaborators': collaborators,
+      'metadata': metadata,
+      'description': description,
+    };
+  }
+
+  // Convert from Map (used for Firestore or other map-based storage)
+  factory Trip.fromMap(Map<String, dynamic> map) {
+    return Trip(
+      id: map['id'],
+      name: map['name'],
+      ownerId: map['ownerId'],
+      containers: (map['containers'] as List)
+          .map((container) => TripContainer.fromMap(container))
+          .toList(),
+      startDate: DateTime.parse(map['startDate']),
+      endDate: DateTime.parse(map['endDate']),
+      collaborators: List<String>.from(map['collaborators']),
+      metadata: Map<String, dynamic>.from(map['metadata'] ?? {}),
+      description: map['description'] ?? '',
+    );
+  }
+
+  // Convert to Map (for storing in Firestore)
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'ownerId': ownerId,
+      'containers': containers.map((c) => c.toMap()).toList(),
       'startDate': startDate.toIso8601String(),
       'endDate': endDate.toIso8601String(),
       'collaborators': collaborators,

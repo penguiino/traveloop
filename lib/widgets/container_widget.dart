@@ -40,17 +40,18 @@ class ContainerWidget extends StatelessWidget {
               ),
               const SizedBox(height: 8.0),
               Text(
-                container.details,
+                container.details.toString(),
                 style: bodyStyle,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (container.subContainers.isNotEmpty)
+
+              if (container.nestedContainers.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: container.subContainers.map((sub) {
+                    children: container.nestedContainers.map((sub) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 4.0),
                         child: Text(

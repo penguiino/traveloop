@@ -3,6 +3,7 @@ import 'package:traveloop/models/trip.dart';
 import 'models/container.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
 import 'screens/trip_list_screen.dart';
 import 'screens/trip_detail_screen.dart';
 import 'screens/container_edit_screen.dart';
@@ -11,6 +12,7 @@ import 'screens/share_screen.dart';
 class AppRoutes {
   static const String home = '/';
   static const String login = '/login';
+  static const String signup = '/signup';
   static const String tripList = '/trip_list';
   static const String tripDetail = '/trip_detail';
   static const String editTrip = '/edit_trip';
@@ -22,6 +24,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case signup:
+        return MaterialPageRoute(builder: (context) => const SignupScreen());
       case tripList:
         final trips = settings.arguments as List<Trip>? ?? [];
         return MaterialPageRoute(

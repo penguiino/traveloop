@@ -13,6 +13,14 @@ class HomeScreen extends StatelessWidget {
     final authProvider = Provider.of<AuthProvider>(context);
     final tripProvider = Provider.of<TripProvider>(context);
 
+    // Check if user is logged in, redirect to login if not
+    if (authProvider.currentUser == null) {
+      Future.microtask(() {
+        Navigator.of(context).pushReplacementNamed('/login');
+      });
+      return const Center(child: CircularProgressIndicator()); // Loading indicator while navigating
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Trips'),
@@ -43,7 +51,8 @@ class HomeScreen extends StatelessWidget {
                 return ListTile(
                   title: Text(trip.name),
                   subtitle: Text(
-                      '${trip.startDate.toLocal()} - ${trip.endDate.toLocal()}'),
+                    '${trip.startDate.toLocal()} - ${trip.endDate.toLocal()}',
+                  ),
                   onTap: () {
                     tripProvider.selectTrip(trip);
                     Navigator.of(context).push(MaterialPageRoute(
@@ -55,8 +64,7 @@ class HomeScreen extends StatelessWidget {
                     onPressed: () {
                       tripProvider.selectTrip(trip);
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            TripEditScreen(trip: trip),
+                        builder: (context) => TripEditScreen(trip: trip),
                       ));
                     },
                   ),
