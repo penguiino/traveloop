@@ -51,10 +51,11 @@ class FirebaseService {
   Future<List<Trip>> getTrips() async {
     print('getTrips() method called');
     try {
+      print('Current user: ${getCurrentUser()}');
       final userId = getCurrentUser()!.uid;
       print('Fetching trips for user: $userId');
       final tripSnapshots = await _firestore.collection('users').doc(userId).collection('trips').get();
-      final trips = tripSnapshots.docs.map((doc) => Trip.fromMap(doc.data() as Map<String, dynamic>)).toList();
+      final trips = tripSnapshots.docs.map((doc) => Trip.fromMap(doc.data())).toList();
       print('Trips fetched: ${trips.length}');
       return trips;
     } catch (e) {

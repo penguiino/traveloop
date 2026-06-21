@@ -18,7 +18,7 @@ class TripDetailScreen extends StatelessWidget {
 
   void _addContainer(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => ContainerEditScreen(), // Handle without container
+      builder: (context) => const ContainerEditScreen(), // Handle without container
     ));
   }
 
@@ -43,7 +43,7 @@ class TripDetailScreen extends StatelessWidget {
             onPressed: () {
               // Navigate to trip edit screen
               Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => ContainerEditScreen(), // Handle without container
+                builder: (context) => const ContainerEditScreen(), // Handle without container
               ));
             },
           ),

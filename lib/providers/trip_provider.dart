@@ -13,8 +13,7 @@ class TripProvider with ChangeNotifier {
   // Method to load trips for the current user
   Future<void> loadTrips(String userId) async {
     try {
-      await _tripService.getTripsByUser(userId);
-      _trips = _tripService.trips; // Update local state with trips
+      _trips = await _tripService.getTripsByUser(userId);
       notifyListeners();
     } catch (e) {
       print('Error loading trips: $e');

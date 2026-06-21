@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 class ContainerEditScreen extends StatefulWidget {
   final TripContainer? container; // The container to edit, if null, we're creating a new one
 
-  const ContainerEditScreen({Key? key, this.container}) : super(key: key);
+  const ContainerEditScreen({super.key, this.container});
 
   @override
   _ContainerEditScreenState createState() => _ContainerEditScreenState();

@@ -9,11 +9,12 @@ class TripService with ChangeNotifier {
   List<Trip> get trips => _trips;
 
   // Method to load trips for a specific user by userId
-  Future<void> getTripsByUser(String userId) async {
+  Future<List<Trip>> getTripsByUser(String userId) async {
     try {
       final trips = await _firebaseService.getTripsByUser(userId);
       _trips = trips;
       notifyListeners();
+      return trips;
     } catch (e) {
       print('Error getting trips by user: $e');
       rethrow; // Handle errors as needed
